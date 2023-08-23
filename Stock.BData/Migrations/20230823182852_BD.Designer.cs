@@ -12,7 +12,7 @@ using Stock.BData;
 namespace Stock.BData.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20230822122436_BD")]
+    [Migration("20230823182852_BD")]
     partial class BD
     {
         /// <inheritdoc />
@@ -27,19 +27,19 @@ namespace Stock.BData.Migrations
 
             modelBuilder.Entity("Stock.BData.Data.Entity.Producto", b =>
                 {
-                    b.Property<int>("IdProductos")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdProductos"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CodProducto")
                         .HasColumnType("int");
 
                     b.Property<string>("NombreProducto")
                         .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("nvarchar(2)");
+                        .HasMaxLength(65)
+                        .HasColumnType("nvarchar(65)");
 
                     b.Property<decimal>("PrecioProducto")
                         .HasColumnType("Decimal(10,2)");
@@ -47,26 +47,20 @@ namespace Stock.BData.Migrations
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
-                    b.HasKey("IdProductos");
-
-                    b.HasIndex(new[] { "IdProductos" }, "Productos_IdProductos_UQ")
-                        .IsUnique();
+                    b.HasKey("Id");
 
                     b.ToTable("Productos");
                 });
 
             modelBuilder.Entity("Stock.BData.Data.Entity.Venta", b =>
                 {
-                    b.Property<int>("IdVenta")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdVenta"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Cantidad")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CodProd")
                         .HasColumnType("int");
 
                     b.Property<int>("CodVenta")
@@ -75,20 +69,33 @@ namespace Stock.BData.Migrations
                     b.Property<DateTime>("FechaVenta")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Precio")
+                    b.Property<decimal>("Precio")
+                        .HasColumnType("Decimal(10,2)");
+
+                    b.Property<int>("ProductoId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Producto")
+                    b.Property<string>("ProductoNombre")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("IdVenta");
+                    b.HasKey("Id");
 
-                    b.HasIndex(new[] { "IdVenta" }, "Informe_IdProd_UQ")
-                        .IsUnique();
+                    b.HasIndex("ProductoId");
 
                     b.ToTable("Ventas");
+                });
+
+            modelBuilder.Entity("Stock.BData.Data.Entity.Venta", b =>
+                {
+                    b.HasOne("Stock.BData.Data.Entity.Producto", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Producto");
                 });
 #pragma warning restore 612, 618
         }

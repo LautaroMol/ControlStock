@@ -20,16 +20,16 @@ namespace Stock.BData
         {
             modelBuilder.Entity<Producto>(o =>
             {
-                o.Property(b => b.IdProductos);
+                o.Property(b => b.Id);
                 o.Property(b => b.NombreProducto);
                 o.Property(b => b.PrecioProducto).HasColumnType("Decimal(10,2)");
                 o.Property(b => b.Stock);
             });
             modelBuilder.Entity<Venta>(o => { 
-                o.Property(b =>b.IdVenta);
-                o.Property(b => b.Producto);
-                o.Property(b => b.CodProd);
-                o.Property(b => b.Precio);
+                o.Property(b =>b.Id);
+                o.Property(b => b.ProductoNombre);
+                o.Property(b => b.ProductoId);
+                o.Property(b => b.Precio).HasColumnType("Decimal(10,2)");
                 o.Property(b => b.FechaVenta);
                 o.Property(b => b.Cantidad);
             });

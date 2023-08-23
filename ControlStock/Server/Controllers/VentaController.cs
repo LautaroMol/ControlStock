@@ -44,13 +44,17 @@ namespace ControlStock.Server.Controllers
             {
                 var mdVenta = new Venta
                 {
-                    CodVenta = (int)ventaDTO.CodVenta,
-                    Producto = ventaDTO.Producto,
-                    CodProd = ventaDTO.CodProducto,
-                    Precio = (int)ventaDTO.Precio,
+                    CodVenta = ventaDTO.CodVenta,
+                    ProductoId = ventaDTO.CodProducto,
                     FechaVenta = ventaDTO.FechaVenta,
                     Cantidad = ventaDTO.Cantidad,
                 };
+                var producto = await context.Productos.FirstOrDefaultAsync(o => o.CodProducto == ventaDTO.CodProducto);
+               if (producto is not null) {
+                    mdVenta.ProductoNombre = producto.NombreProducto;
+                    mdVenta.Producto = producto;
+                    mdVenta.Precio = producto.PrecioProducto * mdVenta.Cantidad;
+                }
                 context.Ventas.Add(mdVenta);
                 await context.SaveChangesAsync();
                 return Ok();
@@ -65,12 +69,13 @@ namespace ControlStock.Server.Controllers
 
             try
             {
+                var producto = await context.Productos.FirstOrDefaultAsync(o => o.CodProducto == ventaDTO.CodProducto);
                 var mdVenta = await context.Ventas.FirstOrDefaultAsync(e => e.CodVenta == codVenta);
                 if (mdVenta != null)
                 {
                     mdVenta.CodVenta = (int)ventaDTO.CodVenta;
-                    mdVenta.Producto = ventaDTO.Producto;
-                    mdVenta.CodProd = ventaDTO.CodProducto;
+                    mdVenta.ProductoNombre = ventaDTO.Producto;
+                    mdVenta.ProductoId = producto.Id;
                     mdVenta.Precio = (int)ventaDTO.Precio;
                     mdVenta.FechaVenta = ventaDTO.FechaVenta;
                     mdVenta.Cantidad = ventaDTO.Cantidad;
@@ -112,7 +117,7 @@ namespace ControlStock.Server.Controllers
                 else
                 {
                     responseApi.EsCorrecto = false;
-                    responseApi.Mensaje = "empleado no encontrado";
+                    responseApi.Mensaje = "Venta no encontrada";
                 }
             }
             catch (Exception ex)

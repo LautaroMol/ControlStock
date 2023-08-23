@@ -16,12 +16,10 @@ namespace Stock.BData.Data.Entity
         public int CodProducto { get; set; }
 
         [Required(ErrorMessage = "El nombre del producto es Obligatorio")]
-        [MaxLength(2, ErrorMessage = "Solo se aceptan hasta 65 caracteres en el nombre del producto")]
+        [MaxLength(65, ErrorMessage = "Solo se aceptan hasta 65 caracteres en el nombre del producto")]
         public string NombreProducto { get; set; }
 		[Required]
-
-		[Range(1, int.MaxValue, ErrorMessage = "El campo {0} es requerido")]
-		public int PrecioProducto { get; set; }
+		public decimal PrecioProducto { get; set; }
 		[Required]
 
 		[Range(1, int.MaxValue, ErrorMessage = "El campo {0} es requerido")]

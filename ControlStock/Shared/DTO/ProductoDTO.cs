@@ -14,8 +14,7 @@ namespace ControlStock.Shared.DTO
         public string NombreProducto { get; set; }
         [Required]
 
-        [Range(1, int.MaxValue, ErrorMessage = "El campo {0} es requerido")]
-        public int PrecioProducto { get; set; }
+        public decimal PrecioProducto { get; set; }
         [Required]
 
         [Range(1, int.MaxValue, ErrorMessage = "El campo {0} es requerido")]
