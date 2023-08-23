@@ -9,17 +9,23 @@ using System.Threading.Tasks;
 
 namespace Stock.BData.Data.Entity
 {
-    [Index(nameof(IdProductos), Name = "Productos_IdProductos_UQ", IsUnique = true)]
-    [PrimaryKey(nameof(IdProductos))]
-    public class Productos
+    public class Producto
     {
-        public int IdProductos { get; set; }
+        public int Id { get; set; }
+        [Required]
+        public int CodProducto { get; set; }
+
         [Required(ErrorMessage = "El nombre del producto es Obligatorio")]
         [MaxLength(2, ErrorMessage = "Solo se aceptan hasta 65 caracteres en el nombre del producto")]
         public string NombreProducto { get; set; }
-        [Required(ErrorMessage = "El precio del producto es Obligatorio")]
-        [MaxLength(2, ErrorMessage = "Solo se aceptan hasta 2 decimales en el precio")]
-        public int PrecioProducto { get; set; }
+		[Required]
+
+		[Range(1, int.MaxValue, ErrorMessage = "El campo {0} es requerido")]
+		public int PrecioProducto { get; set; }
+		[Required]
+
+		[Range(1, int.MaxValue, ErrorMessage = "El campo {0} es requerido")]
+		public int Stock { get; set; }
     }
 
 }
