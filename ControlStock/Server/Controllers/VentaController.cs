@@ -54,6 +54,9 @@ namespace ControlStock.Server.Controllers
                     mdVenta.ProductoNombre = producto.NombreProducto;
                     mdVenta.Producto = producto;
                     mdVenta.Precio = producto.PrecioProducto * mdVenta.Cantidad;
+                    producto.Stock -= ventaDTO.Cantidad;
+                    context.Productos.Update(producto);
+                    await context.SaveChangesAsync();
                 }
                 context.Ventas.Add(mdVenta);
                 await context.SaveChangesAsync();
@@ -73,12 +76,12 @@ namespace ControlStock.Server.Controllers
                 var mdVenta = await context.Ventas.FirstOrDefaultAsync(e => e.CodVenta == codVenta);
                 if (mdVenta != null)
                 {
-                    mdVenta.CodVenta = (int)ventaDTO.CodVenta;
+                    mdVenta.CodVenta = ventaDTO.CodVenta;
                     mdVenta.ProductoNombre = ventaDTO.Producto;
                     mdVenta.ProductoId = producto.Id;
-                    mdVenta.Precio = (int)ventaDTO.Precio;
                     mdVenta.FechaVenta = ventaDTO.FechaVenta;
                     mdVenta.Cantidad = ventaDTO.Cantidad;
+                    mdVenta.Precio = producto.PrecioProducto * mdVenta.Cantidad;
                     context.Ventas.Update(mdVenta);
                     await context.SaveChangesAsync();
                     responseApi.EsCorrecto = true;

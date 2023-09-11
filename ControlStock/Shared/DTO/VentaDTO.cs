@@ -13,8 +13,6 @@ namespace ControlStock.Shared.DTO
         public int CodVenta { get; set; }
         public string Producto { get; set; }
         [Required]
-        public int CodProducto { get; set; }
-        [Required]
         [Range(1, int.MaxValue, ErrorMessage = "El campo {0} es requerido")]
         public decimal Precio { get; set; }
         [Required]
@@ -23,5 +21,8 @@ namespace ControlStock.Shared.DTO
 
         [Range(1, int.MaxValue, ErrorMessage = "El campo {0} es requerido")]
         public int Cantidad { get; set; }
+        [Required]
+        public int CodProducto { get; set; }
+        public ProductoDTO productoDTO { get; set; }
     }
 }
