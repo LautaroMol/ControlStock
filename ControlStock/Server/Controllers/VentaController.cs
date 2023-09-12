@@ -69,12 +69,12 @@ namespace ControlStock.Server.Controllers
         public async Task<IActionResult> Editar(VentaDTO ventaDTO, int codVenta)
         {
             var responseApi = new ResponseAPI<int>();
-
+            int diferencia = 0;
             try
             {
                 var producto = await context.Productos.FirstOrDefaultAsync(o => o.CodProducto == ventaDTO.CodProducto);
                 var mdVenta = await context.Ventas.FirstOrDefaultAsync(e => e.CodVenta == codVenta);
-                if (mdVenta != null)
+                if (mdVenta != null & producto != null)
                 {
                     mdVenta.CodVenta = ventaDTO.CodVenta;
                     mdVenta.ProductoNombre = ventaDTO.Producto;
@@ -82,7 +82,10 @@ namespace ControlStock.Server.Controllers
                     mdVenta.FechaVenta = ventaDTO.FechaVenta;
                     mdVenta.Cantidad = ventaDTO.Cantidad;
                     mdVenta.Precio = producto.PrecioProducto * mdVenta.Cantidad;
+                    diferencia = mdVenta.Cantidad - ventaDTO.Cantidad ;
+                    producto.Stock = producto.Stock - diferencia;
                     context.Ventas.Update(mdVenta);
+                    context.Productos.Update(producto);
                     await context.SaveChangesAsync();
                     responseApi.EsCorrecto = true;
                     responseApi.Valor = mdVenta.CodVenta;
