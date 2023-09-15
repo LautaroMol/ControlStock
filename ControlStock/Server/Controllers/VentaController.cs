@@ -76,19 +76,22 @@ namespace ControlStock.Server.Controllers
                 var mdVenta = await context.Ventas.FirstOrDefaultAsync(e => e.CodVenta == codVenta);
                 if (mdVenta != null & producto != null)
                 {
+                    diferencia += mdVenta.Cantidad;
                     mdVenta.CodVenta = ventaDTO.CodVenta;
                     mdVenta.ProductoNombre = ventaDTO.Producto;
                     mdVenta.ProductoId = producto.Id;
                     mdVenta.FechaVenta = ventaDTO.FechaVenta;
                     mdVenta.Cantidad = ventaDTO.Cantidad;
                     mdVenta.Precio = producto.PrecioProducto * mdVenta.Cantidad;
-                    diferencia = mdVenta.Cantidad - ventaDTO.Cantidad ;
-                    producto.Stock = producto.Stock - diferencia;
+                    diferencia -= ventaDTO.Cantidad;
+                    diferencia = diferencia * -1;
+                    producto.Stock -= diferencia;
                     context.Ventas.Update(mdVenta);
                     context.Productos.Update(producto);
                     await context.SaveChangesAsync();
                     responseApi.EsCorrecto = true;
                     responseApi.Valor = mdVenta.CodVenta;
+                    responseApi.Mensaje = diferencia.ToString();
                 }
                 else
                 {
