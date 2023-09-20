@@ -26,6 +26,11 @@ namespace ControlStock.Client.Services
             }
         }
 
+        public Task<HttpRespuesta<T>> Post<T>(string url)
+        {
+            throw new NotImplementedException();
+        }
+
         private async Task<T> DesSerializar<T>(HttpResponseMessage response)
         {
             var respuestaStr = await response.Content.ReadAsStringAsync();

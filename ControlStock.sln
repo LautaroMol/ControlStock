@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlStock.Server", "ControlStock\Server\ControlStock.Server.csproj", "{A7A8CB6C-DE22-49FA-B1E3-E81DD37AFE48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ControlStock.Server", "ControlStock\Server\ControlStock.Server.csproj", "{A7A8CB6C-DE22-49FA-B1E3-E81DD37AFE48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlStock.Client", "ControlStock\Client\ControlStock.Client.csproj", "{1DDFE1EE-959A-4C8D-B72E-8052A1ACA63E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ControlStock.Client", "ControlStock\Client\ControlStock.Client.csproj", "{1DDFE1EE-959A-4C8D-B72E-8052A1ACA63E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlStock.Shared", "ControlStock\Shared\ControlStock.Shared.csproj", "{46EE0706-B44B-4FAF-A9AF-7166E67C2A89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ControlStock.Shared", "ControlStock\Shared\ControlStock.Shared.csproj", "{46EE0706-B44B-4FAF-A9AF-7166E67C2A89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.BData", "Stock.BData\Stock.BData.csproj", "{EF435A8F-700E-43DE-8ABF-8D38CA0403F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock.BData", "Stock.BData\Stock.BData.csproj", "{EF435A8F-700E-43DE-8ABF-8D38CA0403F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
