@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 
 namespace ControlStock.Client.Services
 {
@@ -26,9 +27,10 @@ namespace ControlStock.Client.Services
             }
         }
 
-        public Task<HttpRespuesta<T>> Post<T>(string url)
+        public async Task<HttpRespuesta<object>> Post<T>(string url, T enviar)
         {
-            throw new NotImplementedException();
+           var enviarJson = JsonSerializer.Serialize(enviar);
+           var enviarContent = new StringContent(enviarJson, Encoding.UTF8,"application/json");
         }
 
         private async Task<T> DesSerializar<T>(HttpResponseMessage response)
