@@ -10,14 +10,17 @@ namespace ControlStock.Shared.DTO
     public class ProductoDTO
     {
         [Required]
-        public int CodProducto { get; set; }
-        public string NombreProducto { get; set; }
+		[Range(1, int.MaxValue, ErrorMessage = "El codigo del producto es requerido")]
+		public int CodProducto { get; set; }
+		[Required(ErrorMessage = "El nombre del producto es Obligatorio")]
+		[MaxLength(65, ErrorMessage = "Solo se aceptan hasta 65 caracteres en el nombre del producto")]
+		public string NombreProducto { get; set; }
+        [Required]
+		[Range(1, int.MaxValue, ErrorMessage = "El precio del producto es requerido")]
+		public decimal PrecioProducto { get; set; }
         [Required]
 
-        public decimal PrecioProducto { get; set; }
-        [Required]
-
-        [Range(1, int.MaxValue, ErrorMessage = "El campo {0} es requerido")]
+        [Range(1, int.MaxValue, ErrorMessage = "El stock del producto es requerido")]
         public int Stock { get; set; }
     }
 }

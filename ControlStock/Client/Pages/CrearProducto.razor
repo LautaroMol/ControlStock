@@ -1,0 +1,16 @@
+﻿@page "/productos/crear"
+@inject NavigationManager navigationManager
+
+<h3>Nuevo Producto</h3>
+
+<FormProfesion producto="producto" onValidSubbmit="Grabar"></FormProfesion>
+
+
+@code {
+	ProductoDTO producto = new ProductoDTO();
+
+	private async void Grabar()
+	{
+		navigationManager.NavigateTo("/productos");
+	}
+}
