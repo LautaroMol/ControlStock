@@ -1,15 +1,33 @@
 ﻿@page "/productos/crear"
+@inject IHttpServicio http
 @inject NavigationManager navigationManager
+
 
 <h3>Nuevo Producto</h3>
 
-<FormProfesion producto="producto" onValidSubbmit="Grabar"></FormProfesion>
+<FormProducto product="producto" onValidSubbmit="Grabar" onCancel="Cancelar"/>
 
 
 @code {
-	ProductoDTO producto = new ProductoDTO();
+	private Producto producto = new Producto();
 
-	private async void Grabar()
+	private async Task Grabar()
+	{
+		ProductoDTO productoDTO = new()
+			{
+				CodProducto = producto.CodProducto,
+				NombreProducto = producto.NombreProducto,
+				PrecioProducto = producto.PrecioProducto,
+				Stock = producto.Stock
+			};
+		var httpRespuesta = await http.Post<ProductoDTO>("api/Producto", productoDTO);
+
+		if (httpRespuesta.Error)
+		{
+			var body = httpRespuesta.HttpResponseMessage;
+		}
+	}
+	private void Cancelar()
 	{
 		navigationManager.NavigateTo("/productos");
 	}

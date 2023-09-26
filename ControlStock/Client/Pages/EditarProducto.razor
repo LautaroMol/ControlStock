@@ -1,0 +1,45 @@
+﻿@page "/profesiones/editar/{productoId:int}"
+@inject IHttpServicio http
+@inject NavigationManager navigationManager
+
+
+<h3>EditarProducto</h3>
+
+<FormProducto product="producto" onValidSubbmit="Grabar" onCancel="Cancelar" />
+
+
+@code {
+	private Producto producto = new();
+	string Mensaje = "";
+	[Parameter] public int productoId { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		await Mostrar();
+	}
+
+	private async Task Mostrar()
+	{
+		var respuesta = await http.Get<Producto>($"api/Producto/{productoId}");
+		if (!respuesta.Error)
+		{
+			producto = respuesta.Respuesta;
+		}
+		else { Mensaje = await respuesta.ObtenerError(); }
+	}
+	private void Cancelar()
+	{
+		navigationManager.NavigateTo("/productos");
+	}
+	private async Task Grabar()
+	{
+		var respuesta = await http.Put<Producto>($"api/Producto/{productoId}", producto);
+
+		if (respuesta.Error)
+		{
+			var body = respuesta.HttpResponseMessage;
+		}
+		navigationManager.NavigateTo("/Productos");
+	}
+}

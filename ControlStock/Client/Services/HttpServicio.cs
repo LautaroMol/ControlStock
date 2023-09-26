@@ -31,14 +31,26 @@ namespace ControlStock.Client.Services
         {
            var enviarJson = JsonSerializer.Serialize(enviar);
            var enviarContent = new StringContent(enviarJson, Encoding.UTF8,"application/json");
+
+           var respuesta = await http.PostAsync(url, enviarContent);
+           return new HttpRespuesta<object>(null,!respuesta.IsSuccessStatusCode, respuesta);
         }
 
-        private async Task<T> DesSerializar<T>(HttpResponseMessage response)
+        private async Task<T?> DesSerializar<T>(HttpResponseMessage response)
         {
             var respuestaStr = await response.Content.ReadAsStringAsync();
 
-            return JsonSerializer.Deserialize<T>(respuestaStr,
-                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+			return JsonSerializer.Deserialize<T>(respuestaStr,
+				new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+		}
+
+        public async Task<HttpRespuesta<object>> Put<T>(string url, T enviar)
+        {
+            var enviarJson = JsonSerializer.Serialize(enviar);
+            var enviarContent = new StringContent(enviarJson, Encoding.UTF8, "application/json");
+
+            var respuesta = await http.PutAsync(url, enviarContent);
+            return new HttpRespuesta<object>(null, !respuesta.IsSuccessStatusCode, respuesta);
         }
     }
 }

@@ -9,7 +9,7 @@
 
 <h3>Lista Productos</h3>
 
-<a class="btn btn-primary" href="/productos/crear">Crear Producto</a>
+<a class="btn btn-primary" href="productos/crear">Crear Producto</a>
 
 <table>
 	<tr>
@@ -44,6 +44,9 @@
 					<td>@item.NombreProducto</td>
 					<td>@item.PrecioProducto</td>
 					<td>@item.Stock</td>
+					<td>
+						<a class="btn btn-primary" href="profesiones/editar/@item.Id">Editar</a>
+					</td>
 				</tr>
 			}
 		}
@@ -55,6 +58,7 @@
 
 	bool Error = false;
 	string Mensaje = "";
+
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();

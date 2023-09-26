@@ -25,13 +25,13 @@ namespace ControlStock.Server.Controllers
             return productos;
         }
 
-        [HttpGet("int:CodProducto")]
-        public async Task<ActionResult<Producto>> GetProdCodigo(int codigo)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<Producto>> Get(int Id)
         {
-            var buscar = await context.Productos.FirstOrDefaultAsync(c => c.CodProducto == codigo);
+            var buscar = await context.Productos.FirstOrDefaultAsync(c => c.Id== Id);
             if (buscar is null)
             {
-                return BadRequest($"Producto no encontrado, verifique el codigo: {codigo}");
+                return BadRequest($"Producto no encontrado, verifique el id: {Id}");
             }
             return Ok(buscar);
         }
@@ -42,54 +42,44 @@ namespace ControlStock.Server.Controllers
         {
             try
             {
-                var mdProducto = new Producto
-                {
-                    CodProducto = productoDTO.CodProducto,
-                    NombreProducto = productoDTO.NombreProducto,
-                    PrecioProducto = productoDTO.PrecioProducto,
-                    Stock = productoDTO.Stock
-                };
-                context.Productos.Add(mdProducto);
-                await context.SaveChangesAsync();
-                return Ok();
+                var exist = await context.Productos.FirstOrDefaultAsync(e => e.CodProducto == productoDTO.CodProducto);
+				if (exist is null) {
+					var mdProducto = new Producto
+					{
+						CodProducto = productoDTO.CodProducto,
+						NombreProducto = productoDTO.NombreProducto,
+						PrecioProducto = productoDTO.PrecioProducto,
+						Stock = productoDTO.Stock
+					};
+					context.Productos.Add(mdProducto);
+					await context.SaveChangesAsync();
+					return Ok();
+				}else return BadRequest("ya existe un producto con este codigo");
             }
             catch (Exception ex) { return BadRequest(ex.Message); }
         }
-        [HttpPut]
+        
+		[HttpPut("{id:int}")]
 
-        public async Task<IActionResult> Editar(ProductoDTO productoDTO, int cod)
-        {
-            var responseApi = new ResponseAPI<int>();
-
-            try
+		public async Task<ActionResult> Put(Producto producto, int id)
+		{
+            if (id != producto.Id) { return BadRequest("id no correspondiente"); }
+			var responseApi = new ResponseAPI<int>();
+			var mdProducto = await context.Productos.AnyAsync(e => e.Id == id);
+            if (!mdProducto)
             {
-                var mdProducto = await context.Productos.FirstOrDefaultAsync(e => e.CodProducto == cod);
-                if (mdProducto != null)
-                {
-                    mdProducto.NombreProducto = productoDTO.NombreProducto;
-                    mdProducto.PrecioProducto = productoDTO.PrecioProducto;
-                    mdProducto.Stock = productoDTO.Stock;
-                    context.Productos.Update(mdProducto);
-                    await context.SaveChangesAsync();
-                    responseApi.EsCorrecto = true;
-                    responseApi.Valor = mdProducto.CodProducto;
-                }
-                else
-                {
-                    responseApi.EsCorrecto = false;
-                    responseApi.Mensaje = "Producto no encontrado";
-                }
+					responseApi.EsCorrecto = false;
+					responseApi.Mensaje = "Producto no encontrado";
+                    return NotFound(responseApi.Mensaje);
             }
-            catch (Exception ex)
-            {
-
-                responseApi.EsCorrecto = false;
-                responseApi.Mensaje = ex.Message;
-            }
-            return Ok(responseApi);
-        }
-
-        [HttpDelete]
+			responseApi.EsCorrecto = true;
+			responseApi.Valor = producto.Id;
+			context.Update(producto);
+			await context.SaveChangesAsync();
+            return Ok(responseApi);		
+		}
+		
+		[HttpDelete]
 
         public async Task<IActionResult> Delete(int cod)
         {
