@@ -1,5 +1,7 @@
 ﻿@page "/productos"
 @inject IHttpServicio http
+@inject NavigationManager navigationManager
+
 
 <PageTitle>Productos</PageTitle>
 
@@ -47,6 +49,11 @@
 					<td>
 						<a class="btn btn-primary" href="profesiones/editar/@item.Id">Editar</a>
 					</td>
+					<td>
+						<a class="btn btn-warning" @onclick="()=>Eliminar(item)">
+							Borrar Producto
+						</a>
+					</td>
 				</tr>
 			}
 		}
@@ -58,6 +65,7 @@
 
 	bool Error = false;
 	string Mensaje = "";
+	Producto ProductoBorrar = new();
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -73,5 +81,16 @@
 			productos = respuesta.Respuesta;
 		}
 		else {Mensaje = await respuesta.ObtenerError(); }
+	}
+	private async void Eliminar(Producto prodBorrar)
+	{
+		ProductoBorrar = prodBorrar;
+		var respuesta = await http.Delete($"api/Producto/{ProductoBorrar.Id}");
+		if (respuesta.Error)
+		{
+			var body = "error al borrar";
+		}
+		await Leer();
+		
 	}
 }

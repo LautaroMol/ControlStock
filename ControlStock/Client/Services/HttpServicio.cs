@@ -52,5 +52,11 @@ namespace ControlStock.Client.Services
             var respuesta = await http.PutAsync(url, enviarContent);
             return new HttpRespuesta<object>(null, !respuesta.IsSuccessStatusCode, respuesta);
         }
+
+        public async Task<HttpRespuesta<object>> Delete(string url)
+        {
+            var respuesta = await http.DeleteAsync(url);
+			return new HttpRespuesta<object>(null, !respuesta.IsSuccessStatusCode, respuesta);
+		}
     }
 }

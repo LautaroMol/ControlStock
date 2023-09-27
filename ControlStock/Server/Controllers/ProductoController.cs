@@ -79,15 +79,15 @@ namespace ControlStock.Server.Controllers
             return Ok(responseApi);		
 		}
 		
-		[HttpDelete]
+		[HttpDelete("{id:int}")]
 
-        public async Task<IActionResult> Delete(int cod)
+        public async Task<IActionResult> Delete(int Id)
         {
             var responseApi = new ResponseAPI<int>();
 
             try
             {
-                var dbProducto = await context.Productos.FirstOrDefaultAsync(e => e.CodProducto == cod);
+                var dbProducto = await context.Productos.FirstOrDefaultAsync(e => e.Id == Id);
                 if (dbProducto != null)
                 {
                     context.Productos.Remove(dbProducto);
