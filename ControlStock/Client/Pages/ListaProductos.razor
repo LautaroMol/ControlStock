@@ -3,6 +3,7 @@
 @inject NavigationManager navigationManager
 
 <style>
+    /* Estilos para la tabla */
     table {
         width: 80%;
         margin: 0 auto;
@@ -18,15 +19,16 @@
         padding: 10px;
     }
 
+    /* Estilos para los botones */
     .btn-editar, .btn-borrar {
         background-color: lightblue; /* Fondo celeste por defecto */
-        color: black; /* Texto negro por defecto */
+        color: white; /* Texto blanco por defecto */
         border: 1px solid black;
         transition: color 0.3s; /* Transición solo para el color del texto */
     }
 
         .btn-editar:hover {
-            color: white; /* Texto blanco al pasar el cursor */
+            color: black; /* Texto negro al pasar el cursor */
         }
 
     .btn-crear-container {
@@ -35,7 +37,7 @@
 
     .btn-crear {
         background-color: green; /* Fondo verde por defecto */
-        color: black; /* Texto negro por defecto */
+        color: white; /* Texto blanco por defecto */
         border: 1px solid black;
         text-align: center;
         padding: 10px;
@@ -44,23 +46,51 @@
     }
 
         .btn-crear:hover {
-            color: white; /* Texto blanco al pasar el cursor */
+            color: black; /* Texto negro al pasar el cursor */
         }
 
     .btn-borrar {
         background-color: red;
         color: white;
     }
-</style>
 
+    /* Estilos para la navegación de páginas */
+    .pagination-container {
+        text-align: center; /* Centra el contenido horizontalmente */
+        margin-top: 20px;
+    }
+
+    .pagination {
+        display: inline-block;
+    }
+
+    .page-link {
+        background-color: black;
+        color: white;
+        border: 1px solid black;
+        padding: 5px 10px;
+        margin: 0 5px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block; /* Alinea los botones horizontalmente */
+    }
+
+        .page-link:hover {
+            background-color: white;
+            color: black;
+        }
+
+        .page-link.disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+    </style>
 
 <PageTitle>Productos</PageTitle>
 
 <HeadContent>
     <meta name="descripcion" content="Listado de Productos" />
 </HeadContent>
-
-<h3 style="text-align: center;">Lista de Productos</h3>
 
 <div class="btn-crear-container">
     <a class="btn btn-crear" href="productos/crear">Crear Producto</a>
@@ -81,69 +111,124 @@
             <td colspan="5">@Mensaje</td>
         </tr>
     }
+    else if (displayedProducts.Count == 0)
+    {
+        <tr>
+            <td colspan="5">No existen datos</td>
+        </tr>
+    }
     else
     {
-        @if (productos == null)
+        @foreach (var item in displayedProducts)
         {
             <tr>
-                <td colspan="5">Cargando...</td>
+                <td>@item.CodProducto</td>
+                <td>@item.NombreProducto</td>
+                <td>@item.PrecioProducto</td>
+                <td>@item.Stock</td>
+                <td>
+                    <a class="btn btn-editar" href="profesiones/editar/@item.Id">Editar</a>
+                    <a class="btn btn-borrar" @onclick="()=>Eliminar(item)">Borrar Producto</a>
+                </td>
             </tr>
-        }
-        else if (productos.Count == 0)
-        {
-            <tr>
-                <td colspan="5">No existen datos</td>
-            </tr>
-        }
-        else
-        {
-            @foreach (var item in productos)
-            {
-                <tr>
-                    <td>@item.CodProducto</td>
-                    <td>@item.NombreProducto</td>
-                    <td>@item.PrecioProducto</td>
-                    <td>@item.Stock</td>
-                    <td>
-                        <a class="btn btn-editar" href="profesiones/editar/@item.Id">Editar</a>
-                        <a class="btn btn-borrar" @onclick="()=>Eliminar(item)">Borrar Producto</a>
-                    </td>
-                </tr>
-            }
         }
     }
 </table>
 
+<!-- Navegación de páginas -->
+@if (totalPages > 1)
+{
+    <div class="pagination-container">
+        <div class="pagination">
+            <button @onclick="PreviousPage" class="page-link" disabled="@(currentPage == 1)">&lt; Anterior</button>
+            <span>Página @currentPage de @totalPages</span>
+            <button @onclick="NextPage" class="page-link" disabled="@(currentPage == totalPages)">Siguiente &gt;</button>
+        </div>
+    </div>
+}
+
 @code {
-	List<Producto>? productos = new();
+    List<Producto> productos = new List<Producto>();
+    int pageSize = 5;
+    int currentPage = 1;
+    int itemsPerPage = 5;
+    int totalPages;
+    List<Producto> displayedProducts = new List<Producto>();
 
-	bool Error = false;
-	string Mensaje = "";
-	Producto ProductoBorrar = new();
+    bool Error = false;
+    string Mensaje = "";
+    Producto ProductoBorrar = new();
 
-	protected override async Task OnInitializedAsync()
-	{
-		await base.OnInitializedAsync();
-		await Leer();
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await Leer();
+        CalculateTotalPages();
+    }
 
-	private async Task Leer()
-	{
-		var respuesta = await http.Get<List<Producto>>("api/Producto");
-		if (!respuesta.Error)
-		{
-			productos = respuesta.Respuesta;
-		}
-		else {Mensaje = await respuesta.ObtenerError(); }
-	}
-	private async Task Eliminar(Producto prodBorrar)
-	{
-		ProductoBorrar = prodBorrar;
-		var respuesta = await http.Delete($"api/Producto/{ProductoBorrar.Id}");
-		if (respuesta.Error)
-		{
-			var body = "error al borrar";
-		}
-		await Leer();
-	}
+    private async Task Leer()
+    {
+        var respuesta = await http.Get<List<Producto>>("api/Producto");
+        if (!respuesta.Error)
+        {
+            productos = respuesta.Respuesta;
+            CalculateTotalPages();
+        }
+        else
+        {
+            Mensaje = await respuesta.ObtenerError();
+        }
+    }
+
+    private void CalculateTotalPages()
+    {
+        totalPages = (int)Math.Ceiling((double)productos.Count / itemsPerPage);
+        UpdateDisplayedProducts();
+    }
+
+    private void UpdateDisplayedProducts()
+    {
+        displayedProducts = productos.Skip((currentPage - 1) * itemsPerPage).Take(itemsPerPage).ToList();
+    }
+
+    private async Task Eliminar(Producto prodBorrar)
+    {
+        ProductoBorrar = prodBorrar;
+        var respuesta = await http.Delete($"api/Producto/{ProductoBorrar.Id}");
+        if (respuesta.Error)
+        {
+            var body = "error al borrar";
+        }
+        else
+        {
+            // Eliminación exitosa, actualiza la lista de productos
+            await Leer();
+
+            // Verifica si el producto eliminado era el último de la página actual
+            if (displayedProducts.Count == 0)
+            {
+                // Si la página actual queda vacía, retrocede a la página 1
+                currentPage -= 1;
+                await Leer(); // Actualiza nuevamente la lista para mostrar la página 1
+            }
+        }
+    }
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            UpdateDisplayedProducts();
+        }
+    }
+
+    private void NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            UpdateDisplayedProducts();
+        }
+    }
 }
