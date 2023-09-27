@@ -2,62 +2,116 @@
 @inject IHttpServicio http
 @inject NavigationManager navigationManager
 
+<style>
+    table {
+        width: 80%;
+        margin: 0 auto;
+        border-collapse: collapse;
+        text-align: center;
+    }
+
+    table, th, td {
+        border: 1px solid black;
+    }
+
+    th, td {
+        padding: 10px;
+    }
+
+    .btn-editar, .btn-borrar {
+        background-color: lightblue; /* Fondo celeste por defecto */
+        color: black; /* Texto negro por defecto */
+        border: 1px solid black;
+        transition: color 0.3s; /* Transición solo para el color del texto */
+    }
+
+        .btn-editar:hover {
+            color: white; /* Texto blanco al pasar el cursor */
+        }
+
+    .btn-crear-container {
+        text-align: center; /* Centra el botón "Crear Producto" */
+    }
+
+    .btn-crear {
+        background-color: green; /* Fondo verde por defecto */
+        color: black; /* Texto negro por defecto */
+        border: 1px solid black;
+        text-align: center;
+        padding: 10px;
+        text-decoration: none;
+        transition: color 0.3s; /* Transición solo para el color del texto */
+    }
+
+        .btn-crear:hover {
+            color: white; /* Texto blanco al pasar el cursor */
+        }
+
+    .btn-borrar {
+        background-color: red;
+        color: white;
+    }
+</style>
+
 
 <PageTitle>Productos</PageTitle>
 
 <HeadContent>
-	<meta name="descripcion" content="Listado de profesiones" />
+    <meta name="descripcion" content="Listado de Productos" />
 </HeadContent>
 
-<h3>Lista Productos</h3>
+<h3 style="text-align: center;">Lista de Productos</h3>
 
-<a class="btn btn-primary" href="productos/crear">Crear Producto</a>
+<div class="btn-crear-container">
+    <a class="btn btn-crear" href="productos/crear">Crear Producto</a>
+</div>
 
 <table>
-	<tr>
-		<th>Codigo</th>
-		<th>Nombre Producto</th>
-		<th>Precio Producto</th>
-		<th>Stock</th>
-	</tr>
+    <tr>
+        <th>Codigo</th>
+        <th>Nombre del Producto</th>
+        <th>Precio del Producto</th>
+        <th>Stock</th>
+        <th>Acciones</th>
+    </tr>
 
-	@if (Error)
-	{
-		<tr>@Mensaje</tr>
-	}
-	else
-	{
-
-		@if (productos == null)
-		{
-			<tr>Cargando...</tr>
-		}
-		else if (productos.Count == 0)
-		{
-			<tr>no existen datos</tr>
-		}
-
-		else
-		{
-			@foreach (var item in productos)
-			{
-				<tr>
-					<td>@item.CodProducto</td>
-					<td>@item.NombreProducto</td>
-					<td>@item.PrecioProducto</td>
-					<td>@item.Stock</td>
-					<td>
-						<a class="btn btn-primary" href="profesiones/editar/@item.Id">Editar</a>
-					</td>
-					<td>
-						<a class="btn btn-warning" @onclick="()=>Eliminar(item)">
-							Borrar Producto
-						</a>
-					</td>
-				</tr>
-			}
-		}
-	}
+    @if (Error)
+    {
+        <tr>
+            <td colspan="5">@Mensaje</td>
+        </tr>
+    }
+    else
+    {
+        @if (productos == null)
+        {
+            <tr>
+                <td colspan="5">Cargando...</td>
+            </tr>
+        }
+        else if (productos.Count == 0)
+        {
+            <tr>
+                <td colspan="5">No existen datos</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in productos)
+            {
+                <tr>
+                    <td>@item.CodProducto</td>
+                    <td>@item.NombreProducto</td>
+                    <td>@item.PrecioProducto</td>
+                    <td>@item.Stock</td>
+                    <td>
+                        <a class="btn btn-editar" href="profesiones/editar/@item.Id">Editar</a>
+                        <a class="btn btn-borrar" @onclick="()=>Eliminar(item)">Borrar Producto</a>
+                    </td>
+                </tr>
+            }
+        }
+    }
 </table>
 
 @code {
@@ -82,7 +136,7 @@
 		}
 		else {Mensaje = await respuesta.ObtenerError(); }
 	}
-	private async void Eliminar(Producto prodBorrar)
+	private async Task Eliminar(Producto prodBorrar)
 	{
 		ProductoBorrar = prodBorrar;
 		var respuesta = await http.Delete($"api/Producto/{ProductoBorrar.Id}");
@@ -91,6 +145,5 @@
 			var body = "error al borrar";
 		}
 		await Leer();
-		
 	}
 }
