@@ -25,14 +25,14 @@ namespace ControlStock.Server.Controllers
             return venta;
         }
 
-        [HttpGet("int:codven")]
-        public async Task<ActionResult<Venta>> Getcodven(int codven)
+        [HttpGet("int:Id")]
+        public async Task<ActionResult<Venta>> Getcodven(int Id)
         {
-            var buscar = await context.Ventas.FirstOrDefaultAsync(c => c.CodVenta == codven);
+            var buscar = await context.Ventas.FirstOrDefaultAsync(c => c.Id == Id);
 
             if (buscar is null)
             {
-                return BadRequest($"No se encontro la Venta de numero: {codven}");
+                return BadRequest($"No se encontro la Venta de numero: {Id}");
             }
             return buscar;
         }
@@ -42,27 +42,45 @@ namespace ControlStock.Server.Controllers
         {
             try
             {
+                var producto = await context.Productos.FirstOrDefaultAsync(o => o.CodProducto == ventaDTO.CodProducto);
+
+                if (producto is null)
+                {
+                    // El producto no se encontró, devuelve un error.
+                    return BadRequest("El producto no existe.");
+                }
+
+                if (producto.Stock < ventaDTO.Cantidad)
+                {
+                    // Stock insuficiente, devuelve un error.
+                    return BadRequest("Stock insuficiente.");
+                }
+
+                // Resto la cantidad vendida del stock.
+                producto.Stock -= ventaDTO.Cantidad;
+                context.Productos.Update(producto);
+                await context.SaveChangesAsync();
+
                 var mdVenta = new Venta
                 {
                     CodVenta = ventaDTO.CodVenta,
-                    ProductoId = ventaDTO.CodProducto,
                     FechaVenta = ventaDTO.FechaVenta,
                     Cantidad = ventaDTO.Cantidad,
+                    CodProducto = producto.CodProducto,
+                    ProductoNombre = producto.NombreProducto,
+                    Producto = producto,
+                    Precio = producto.PrecioProducto * ventaDTO.Cantidad
                 };
-                var producto = await context.Productos.FirstOrDefaultAsync(o => o.CodProducto == ventaDTO.CodProducto);
-               if (producto is not null) {
-                    mdVenta.ProductoNombre = producto.NombreProducto;
-                    mdVenta.Producto = producto;
-                    mdVenta.Precio = producto.PrecioProducto * mdVenta.Cantidad;
-                    producto.Stock -= ventaDTO.Cantidad;
-                    context.Productos.Update(producto);
-                    await context.SaveChangesAsync();
-                }
+
                 context.Ventas.Add(mdVenta);
                 await context.SaveChangesAsync();
+
                 return Ok();
             }
-            catch (Exception ex) { return BadRequest(ex.Message); }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpPut]
 
@@ -79,7 +97,7 @@ namespace ControlStock.Server.Controllers
                     diferencia += mdVenta.Cantidad;
                     mdVenta.CodVenta = ventaDTO.CodVenta;
                     mdVenta.ProductoNombre = ventaDTO.Producto;
-                    mdVenta.ProductoId = producto.Id;
+                    mdVenta.CodProducto = producto.Id;
                     mdVenta.FechaVenta = ventaDTO.FechaVenta;
                     mdVenta.Cantidad = ventaDTO.Cantidad;
                     mdVenta.Precio = producto.PrecioProducto * mdVenta.Cantidad;

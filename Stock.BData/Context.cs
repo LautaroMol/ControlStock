@@ -28,12 +28,13 @@ namespace Stock.BData
             modelBuilder.Entity<Venta>(o => { 
                 o.Property(b =>b.Id);
                 o.Property(b => b.ProductoNombre);
-                o.Property(b => b.ProductoId);
+                o.Property(b => b.CodProducto);
                 o.Property(b => b.Precio).HasColumnType("Decimal(10,2)");
                 o.Property(b => b.FechaVenta);
                 o.Property(b => b.Cantidad);
+                o.HasOne(b => b.Producto);
             });
-            base.OnModelCreating(modelBuilder);
+            
         }
     }
 }

@@ -1,0 +1,233 @@
+﻿@page "/ventas"
+@inject IHttpServicio http
+@inject NavigationManager navigationManager
+
+<style>
+    /* Estilos adicionales */
+    table {
+        width: 80%;
+        margin: 0 auto;
+        border-collapse: collapse;
+        text-align: center;
+    }
+
+    table, th, td {
+        border: 1px solid black;
+    }
+
+    th, td {
+        padding: 10px;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 5px;
+    }
+
+    /* Estilo para el botón "Cargar Nueva Venta" */
+    .btn-cargar-container {
+        text-align: center;
+    }
+
+    .btn-cargar {
+        background-color: blue; /* Fondo azul por defecto */
+        color: white; /* Texto blanco por defecto */
+        border: 1px solid black;
+        text-align: center;
+        padding: 10px;
+        text-decoration: none;
+        transition: color 0.3s, background-color 0.3s; /* Transición para color de texto y fondo */
+    }
+
+        .btn-cargar:hover {
+            color: black; /* Texto negro al pasar el cursor */
+        }
+
+    /* Estilo para el botón "Editar" con fondo celeste oscuro */
+    .btn-editar-celeste {
+        background-color: #007BFF; /* Celeste oscuro */
+        color: white; /* Texto blanco por defecto */
+        border: 1px solid black;
+        text-decoration: none;
+        padding: 5px 10px;
+        transition: color 0.3s, background-color 0.3s; /* Transición para color de texto y fondo */
+    }
+
+        .btn-editar-celeste:hover {
+            color: black; /* Texto negro al pasar el cursor */
+        }
+
+    .btn-borrar {
+        background-color: red; /* Fondo rojo por defecto */
+        color: white; /* Texto blanco por defecto */
+        border: 1px solid black;
+        text-decoration: none;
+        padding: 5px 10px;
+        transition: color 0.3s, background-color 0.3s; /* Transición para color de texto y fondo */
+    }
+
+        .btn-borrar:hover {
+            color: black; /* Texto negro al pasar el cursor */
+        }
+</style>
+
+<PageTitle>Lista de ventas</PageTitle>
+
+<HeadContent>
+    <meta name="descripcion" content="Listado de Ventas" />
+</HeadContent>
+<PageTitle>Lista de ventas</PageTitle>
+
+<HeadContent>
+    <meta name="descripcion" content="Listado de Ventas" />
+</HeadContent>
+
+<!-- Botón "Cargar Nueva Venta" centrado en medio de la tabla -->
+<div class="btn-cargar-container">
+    <a class="btn btn-cargar" href="ventas/crear">Cargar Nueva Venta</a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Codigo de Venta</th>
+            <th>Nombre del Producto</th>
+            <th>Precio del Producto</th>
+            <th>Fecha de venta</th>
+            <th>Cantidad vendida</th>
+            <th>Codigo del producto vendido</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Error)
+        {
+            <tr>
+                <td colspan="7">@Mensaje</td>
+            </tr>
+        }
+        else if (displayedProducts.Count == 0)
+        {
+            <tr>
+                <td colspan="7">No existen datos</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in displayedProducts)
+            {
+                <tr>
+                    <td>@item.CodVenta</td>
+                    <td>@item.ProductoNombre</td>
+                    <td>@item.Precio</td>
+                    <td>@item.FechaVenta.ToShortDateString()</td>
+                    <td>@item.Cantidad</td>
+                    <td>@item.CodProducto</td>
+                    <td>
+                        <div class="btn-group">
+                            <a class="btn btn-editar-celeste" href="profesiones/editar/@item.Id">Editar</a>
+                            <button class="btn btn-borrar" @onclick="()=>Eliminar(item)">Borrar Venta</button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<!-- Navegación de páginas -->
+@if (totalPages > 1)
+{
+    <div class="pagination-container">
+        <div class="pagination">
+            <button @onclick="PreviousPage" class="page-link" disabled="@(currentPage == 1)">&lt; Anterior</button>
+            <span>Página @currentPage de @totalPages</span>
+            <button @onclick="NextPage" class="page-link" disabled="@(currentPage == totalPages)">Siguiente &gt;</button>
+        </div>
+    </div>
+}
+
+@code {
+    List<Venta> ventas = new List<Venta>();
+    int pageSize = 5;
+    int currentPage = 1;
+    int itemsPerPage = 5;
+    int totalPages;
+    List<Venta> displayedProducts = new List<Venta>();
+    bool Error = false;
+    string Mensaje = "";
+    Venta VentaBorrar = new Venta();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await Leer();
+        CalculateTotalPages();
+    }
+
+    private async Task Leer()
+    {
+        var respuesta = await http.Get<List<Venta>>("api/Venta");
+        if (!respuesta.Error)
+        {
+            ventas = respuesta.Respuesta;
+            CalculateTotalPages();
+        }
+        else
+        {
+            Mensaje = await respuesta.ObtenerError();
+        }
+    }
+
+    private void CalculateTotalPages()
+    {
+        totalPages = (int)Math.Ceiling((double)ventas.Count / itemsPerPage);
+        UpdateDisplayedProducts();
+    }
+
+    private void UpdateDisplayedProducts()
+    {
+        displayedProducts = ventas.Skip((currentPage - 1) * itemsPerPage).Take(itemsPerPage).ToList();
+    }
+
+    private async Task Eliminar(Venta VentaBorr)
+    {
+        VentaBorrar = VentaBorr;
+        var respuesta = await http.Delete($"api/Venta/{VentaBorrar.Id}");
+        if (respuesta.Error)
+        {
+            var body = "error al borrar";
+        }
+        else
+        {
+            // Eliminación exitosa, actualiza la lista de productos
+            await Leer();
+
+            // Verifica si el producto eliminado era el último de la página actual
+            if (displayedProducts.Count == 0)
+            {
+                // Si la página actual queda vacía, retrocede a la página 1
+                currentPage -= 1;
+                await Leer(); // Actualiza nuevamente la lista para mostrar la página 1
+            }
+        }
+    }
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            UpdateDisplayedProducts();
+        }
+    }
+
+    private void NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            UpdateDisplayedProducts();
+        }
+    }
+}

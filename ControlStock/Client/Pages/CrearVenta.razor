@@ -1,0 +1,107 @@
+﻿@page "/ventas/crear"
+@inject IHttpServicio http
+@inject NavigationManager navigationManager
+
+<h3>Nueva Venta</h3>
+
+<FormVenta vent="venta" onValidSubmit="Grabar" OnCancel="Cancelar" />
+
+@code {
+    private Venta venta = new Venta();
+    private ProductoDTO producto = new ProductoDTO();
+    private bool mostrarErrorProductoNoEncontrado = false;
+    private bool mostrarErrorStockInsuficiente = false;
+
+    private async Task Grabar()
+    {
+        VentaDTO ventaDTO = new VentaDTO
+            {
+                CodVenta = venta.CodVenta,
+                FechaVenta = venta.FechaVenta,
+                Cantidad = venta.Cantidad,
+                CodProducto = venta.CodProducto,
+            };
+
+        var respuesta = await http.GetCod<ProductoDTO>($"api/Producto/GetCod/{ventaDTO.CodProducto}");
+
+        if (!respuesta.Error)
+        {
+            producto = respuesta.Respuesta;
+            ventaDTO.Producto = producto.NombreProducto;
+            ventaDTO.Precio = producto.PrecioProducto;
+            ventaDTO.productoDTO = producto;
+
+            if (producto.Stock < ventaDTO.Cantidad)
+            {
+                mostrarErrorStockInsuficiente = true;
+                mostrarErrorProductoNoEncontrado = false; // Ocultar el mensaje de producto no encontrado si estaba visible
+                return;
+            }
+        }
+        else
+        {
+            mostrarErrorProductoNoEncontrado = true;
+            mostrarErrorStockInsuficiente = false; // Ocultar el mensaje de stock insuficiente si estaba visible
+            return;
+        }
+
+        var httpRespuesta = await http.Post<VentaDTO>("api/Venta", ventaDTO);
+
+        if (httpRespuesta.Error && httpRespuesta.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            var errorResponse = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+            if (errorResponse.Contains("Stock insuficiente"))
+            {
+                mostrarErrorStockInsuficiente = true;
+                mostrarErrorProductoNoEncontrado = false; // Ocultar el mensaje de producto no encontrado si estaba visible
+                return;
+            }
+        }
+
+        if (httpRespuesta.Error)
+        {
+            var body = httpRespuesta.HttpResponseMessage;
+        }
+        else
+        {
+            navigationManager.NavigateTo("/ventas");
+        }
+    }
+
+    private void Cancelar()
+    {
+        navigationManager.NavigateTo("/ventas");
+    }
+
+    private void CerrarErrorProductoNoEncontrado()
+    {
+        mostrarErrorProductoNoEncontrado = false;
+    }
+
+    private void CerrarErrorStockInsuficiente()
+    {
+        mostrarErrorStockInsuficiente = false;
+    }
+}
+
+@if (mostrarErrorProductoNoEncontrado)
+{
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 5px;">
+            <h4>Error</h4>
+            <p style="color: red;">Producto no encontrado.</p>
+            <button class="btn btn-primary" @onclick="CerrarErrorProductoNoEncontrado">Cerrar</button>
+        </div>
+    </div>
+}
+
+@if (mostrarErrorStockInsuficiente)
+{
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 5px;">
+            <h4>Error</h4>
+            <p style="color: red;">Stock insuficiente.</p>
+            <button class="btn btn-primary" @onclick="CerrarErrorStockInsuficiente">Cerrar</button>
+        </div>
+    </div>
+}

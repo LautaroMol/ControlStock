@@ -34,7 +34,8 @@ namespace Stock.BData.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CodVenta = table.Column<int>(type: "int", nullable: false),
-                    ProductoNombre = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ProductoNombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CodProducto = table.Column<int>(type: "int", nullable: false),
                     ProductoId = table.Column<int>(type: "int", nullable: false),
                     Precio = table.Column<decimal>(type: "Decimal(10,2)", nullable: false),
                     FechaVenta = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -48,7 +49,7 @@ namespace Stock.BData.Migrations
                         column: x => x.ProductoId,
                         principalTable: "Productos",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(

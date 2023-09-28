@@ -12,7 +12,7 @@ using Stock.BData;
 namespace Stock.BData.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20230925221438_BD")]
+    [Migration("20230928195020_BD")]
     partial class BD
     {
         /// <inheritdoc />
@@ -63,6 +63,9 @@ namespace Stock.BData.Migrations
                     b.Property<int>("Cantidad")
                         .HasColumnType("int");
 
+                    b.Property<int>("CodProducto")
+                        .HasColumnType("int");
+
                     b.Property<int>("CodVenta")
                         .HasColumnType("int");
 
@@ -77,8 +80,7 @@ namespace Stock.BData.Migrations
 
                     b.Property<string>("ProductoNombre")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -92,7 +94,7 @@ namespace Stock.BData.Migrations
                     b.HasOne("Stock.BData.Data.Entity.Producto", "Producto")
                         .WithMany()
                         .HasForeignKey("ProductoId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Producto");

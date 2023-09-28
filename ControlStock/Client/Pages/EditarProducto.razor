@@ -1,4 +1,4 @@
-﻿@page "/profesiones/editar/{productoId:int}"
+﻿@page "/producto/editar/{productoId:int}"
 @inject IHttpServicio http
 @inject NavigationManager navigationManager
 
@@ -12,7 +12,6 @@
 	private Producto producto = new();
 	string Mensaje = "";
 	[Parameter] public int productoId { get; set; }
-
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();

@@ -26,8 +26,28 @@ namespace ControlStock.Client.Services
                 return new HttpRespuesta<T>(default, true, response);
             }
         }
+        public async Task<HttpRespuesta<T>> GetCod<T>(string url)
+		{
+			var response = await http.GetAsync(url);
 
-        public async Task<HttpRespuesta<object>> Post<T>(string url, T enviar)
+			if (response.IsSuccessStatusCode)
+			{
+				var respuesta = await DesSerializar<T>(response);
+				return new HttpRespuesta<T>(respuesta, false, response);
+			}
+			else
+			{
+				return new HttpRespuesta<T>(default, true, response);
+			}
+		}
+
+
+		private async Task<HttpResponseMessage> GetId<T>(string url)
+    {
+        return await http.GetAsync(url);
+    }
+
+		public async Task<HttpRespuesta<object>> Post<T>(string url, T enviar)
         {
            var enviarJson = JsonSerializer.Serialize(enviar);
            var enviarContent = new StringContent(enviarJson, Encoding.UTF8,"application/json");

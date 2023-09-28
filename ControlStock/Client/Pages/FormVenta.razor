@@ -1,0 +1,55 @@
+﻿<!-- FormVenta.razor -->
+
+<EditForm Model="vent" OnValidSubmit="onValidSubmit">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label>Codigo Venta</label>
+        <div>
+            <InputNumber class="form-control" @bind-Value="vent.CodVenta" />
+            <ValidationMessage For="@(() => vent.CodVenta)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Fecha Venta</label>
+        <div>
+            <InputDate class="form-control" @bind-Value="vent.FechaVenta" />
+            <ValidationMessage For="@(() => vent.FechaVenta)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Cantidad</label>
+        <div>
+            <InputNumber class="form-control" @bind-Value="vent.Cantidad" />
+            <ValidationMessage For="@(() => vent.Cantidad)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Codigo del Producto</label>
+        <div>
+            <InputNumber class="form-control" @bind-Value="vent.CodProducto" />
+            <ValidationMessage For="@(() => vent.CodProducto)"/>
+        </div>
+    </div>
+
+    <br />
+    <button class="btn btn-primary" type="submit">Aceptar</button>
+    <button class="btn btn-secondary" @onclick="OnCancel">Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter] public Venta vent { get; set; } = new Venta();
+    [Parameter] public EventCallback onValidSubmit { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    //CodVenta = venta.CodVenta,
+	//FechaVenta = venta.FechaVenta,
+	//Cantidad = venta.Cantidad,
+	//CodProducto = venta.CodProducto,
+	//Producto = venta.ProductoNombre,
+	//Precio = venta.Precio,
+    //producto.Stock -= ventaDTO.Cantidad;
+    // Puedes agregar más propiedades y métodos si es necesario
+}

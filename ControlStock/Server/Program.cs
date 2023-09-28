@@ -6,7 +6,8 @@ using Stock.BData;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+//add CORS
+builder.Services.AddCors(op => op.AddPolicy("AllowWebapp", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<Context>(opciones => opciones.UseSqlServer("name=Conn"));
@@ -37,7 +38,7 @@ app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseCors("allowWebapp");
 
 app.MapRazorPages();
 app.MapControllers();

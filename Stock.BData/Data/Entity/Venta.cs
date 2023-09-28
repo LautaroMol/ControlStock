@@ -15,11 +15,10 @@ namespace Stock.BData.Data.Entity
         [Required]
 
         public int CodVenta { get; set; }
-
-        [Required]
-        [MaxLength(50, ErrorMessage = "Solo se aceptan hasta 50 caracteres en el nombre del producto")]
         public string ProductoNombre { get; set; }
         [Required]
+        public int CodProducto { get; set; }
+        [Required]  
         public int ProductoId { get; set; }
         public Producto Producto { get; set; }
         public decimal Precio { get; set; }

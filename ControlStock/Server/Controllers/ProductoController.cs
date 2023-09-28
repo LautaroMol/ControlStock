@@ -26,7 +26,7 @@ namespace ControlStock.Server.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<Producto>> Get(int Id)
+        public async Task<ActionResult<Producto>> GetId(int Id)
         {
             var buscar = await context.Productos.FirstOrDefaultAsync(c => c.Id== Id);
             if (buscar is null)
@@ -35,8 +35,17 @@ namespace ControlStock.Server.Controllers
             }
             return Ok(buscar);
         }
+		[HttpGet("GetCod/{cod:int}")]
+		public async Task<ActionResult<Producto>> GetCod(int cod) { 
+			var buscar = await context.Productos.FirstOrDefaultAsync(c => c.CodProducto == cod);
+			if (buscar is null)
+			{
+				return BadRequest($"Producto no encontrado, verifique el cod: {cod}");
+			}
+			    return Ok(buscar);
+		}
 
-        [HttpPost]
+		[HttpPost]
 
         public async Task<IActionResult> Post(ProductoDTO productoDTO)
         {
@@ -49,7 +58,8 @@ namespace ControlStock.Server.Controllers
 						CodProducto = productoDTO.CodProducto,
 						NombreProducto = productoDTO.NombreProducto,
 						PrecioProducto = productoDTO.PrecioProducto,
-						Stock = productoDTO.Stock
+						Stock = productoDTO.Stock,
+  
 					};
 					context.Productos.Add(mdProducto);
 					await context.SaveChangesAsync();

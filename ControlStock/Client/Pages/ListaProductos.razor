@@ -21,7 +21,7 @@
 
     /* Estilos para los botones */
     .btn-editar, .btn-borrar {
-        background-color: lightblue; /* Fondo celeste por defecto */
+        background-color: #007BFF; /* Fondo celeste por defecto */
         color: white; /* Texto blanco por defecto */
         border: 1px solid black;
         transition: color 0.3s; /* Transición solo para el color del texto */
@@ -127,7 +127,7 @@
                 <td>@item.PrecioProducto</td>
                 <td>@item.Stock</td>
                 <td>
-                    <a class="btn btn-editar" href="profesiones/editar/@item.Id">Editar</a>
+                    <a class="btn btn-editar" href="producto/editar/@item.Id">Editar</a>
                     <a class="btn btn-borrar" @onclick="()=>Eliminar(item)">Borrar Producto</a>
                 </td>
             </tr>
