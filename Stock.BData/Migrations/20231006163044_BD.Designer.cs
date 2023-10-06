@@ -12,7 +12,7 @@ using Stock.BData;
 namespace Stock.BData.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20230928195020_BD")]
+    [Migration("20231006163044_BD")]
     partial class BD
     {
         /// <inheritdoc />
@@ -72,32 +72,9 @@ namespace Stock.BData.Migrations
                     b.Property<DateTime>("FechaVenta")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("Precio")
-                        .HasColumnType("Decimal(10,2)");
-
-                    b.Property<int>("ProductoId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductoNombre")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductoId");
-
                     b.ToTable("Ventas");
-                });
-
-            modelBuilder.Entity("Stock.BData.Data.Entity.Venta", b =>
-                {
-                    b.HasOne("Stock.BData.Data.Entity.Producto", "Producto")
-                        .WithMany()
-                        .HasForeignKey("ProductoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Producto");
                 });
 #pragma warning restore 612, 618
         }

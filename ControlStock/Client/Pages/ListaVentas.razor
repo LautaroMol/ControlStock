@@ -76,11 +76,6 @@
 <HeadContent>
     <meta name="descripcion" content="Listado de Ventas" />
 </HeadContent>
-<PageTitle>Lista de ventas</PageTitle>
-
-<HeadContent>
-    <meta name="descripcion" content="Listado de Ventas" />
-</HeadContent>
 
 <!-- Botón "Cargar Nueva Venta" centrado en medio de la tabla -->
 <div class="btn-cargar-container">
@@ -116,10 +111,29 @@
         {
             @foreach (var item in displayedProducts)
             {
+                var producto = productos.FirstOrDefault(p => p.CodProducto == item.CodProducto);
                 <tr>
                     <td>@item.CodVenta</td>
-                    <td>@item.ProductoNombre</td>
-                    <td>@item.Precio</td>
+                    <td>
+                        @if (producto != null)
+                        {
+                            @producto.NombreProducto
+                        }
+                        else
+                        {
+                            <span>El producto de código @item.CodProducto se borró</span>
+                        }
+                    </td>
+                    <td>
+                        @if (producto != null)
+                        {
+                            @producto.PrecioProducto
+                        }
+                        else
+                        {
+                            <span>El producto de código @item.CodProducto se borró</span>
+                        }
+                    </td>
                     <td>@item.FechaVenta.ToShortDateString()</td>
                     <td>@item.Cantidad</td>
                     <td>@item.CodProducto</td>
@@ -131,6 +145,7 @@
                     </td>
                 </tr>
             }
+
         }
     </tbody>
 </table>
@@ -149,6 +164,7 @@
 
 @code {
     List<Venta> ventas = new List<Venta>();
+    List<Producto> productos = new List<Producto>(); // Agrega la lista de productos
     int pageSize = 5;
     int currentPage = 1;
     int itemsPerPage = 5;
@@ -161,17 +177,31 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        await Leer();
+        await LeerVentas();
+        await LeerProductos(); // Carga los productos
         CalculateTotalPages();
     }
 
-    private async Task Leer()
+    private async Task LeerVentas()
     {
         var respuesta = await http.Get<List<Venta>>("api/Venta");
         if (!respuesta.Error)
         {
             ventas = respuesta.Respuesta;
             CalculateTotalPages();
+        }
+        else
+        {
+            Mensaje = await respuesta.ObtenerError();
+        }
+    }
+
+    private async Task LeerProductos()
+    {
+        var respuesta = await http.Get<List<Producto>>("api/Producto");
+        if (!respuesta.Error)
+        {
+            productos = respuesta.Respuesta;
         }
         else
         {
@@ -196,22 +226,23 @@
         var respuesta = await http.Delete($"api/Venta/{VentaBorrar.Id}");
         if (respuesta.Error)
         {
-            var body = "error al borrar";
+            Mensaje = "Error al borrar la venta"; // Cambia esto para mostrar un mensaje de error
         }
         else
         {
-            // Eliminación exitosa, actualiza la lista de productos
-            await Leer();
+            // Eliminación exitosa, actualiza la lista de ventas
+            await LeerVentas();
 
-            // Verifica si el producto eliminado era el último de la página actual
+            // Verifica si la venta eliminada era la última de la página actual
             if (displayedProducts.Count == 0)
             {
                 // Si la página actual queda vacía, retrocede a la página 1
                 currentPage -= 1;
-                await Leer(); // Actualiza nuevamente la lista para mostrar la página 1
+                await LeerVentas(); // Actualiza nuevamente la lista para mostrar la página 1
             }
         }
     }
+
 
     private void PreviousPage()
     {

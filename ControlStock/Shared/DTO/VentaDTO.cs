@@ -11,9 +11,6 @@ namespace ControlStock.Shared.DTO
     {
         [Required]
         public int CodVenta { get; set; }
-        public string Producto { get; set; }
-        [Required]
-        public decimal Precio { get; set; }
         [Required]
         public DateTime FechaVenta { get; set; }
         [Required]
@@ -22,7 +19,5 @@ namespace ControlStock.Shared.DTO
         public int Cantidad { get; set; }
         [Required]
         public int CodProducto { get; set; }
-        [Required]
-        public ProductoDTO productoDTO { get; set; }
     }
 }

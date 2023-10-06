@@ -67,9 +67,6 @@ namespace ControlStock.Server.Controllers
                     FechaVenta = ventaDTO.FechaVenta,
                     Cantidad = ventaDTO.Cantidad,
                     CodProducto = producto.CodProducto,
-                    ProductoNombre = producto.NombreProducto,
-                    Producto = producto,
-                    Precio = producto.PrecioProducto * ventaDTO.Cantidad
                 };
 
                 context.Ventas.Add(mdVenta);
@@ -96,11 +93,9 @@ namespace ControlStock.Server.Controllers
                 {
                     diferencia += mdVenta.Cantidad;
                     mdVenta.CodVenta = ventaDTO.CodVenta;
-                    mdVenta.ProductoNombre = ventaDTO.Producto;
                     mdVenta.CodProducto = producto.Id;
                     mdVenta.FechaVenta = ventaDTO.FechaVenta;
                     mdVenta.Cantidad = ventaDTO.Cantidad;
-                    mdVenta.Precio = producto.PrecioProducto * mdVenta.Cantidad;
                     diferencia -= ventaDTO.Cantidad;
                     diferencia = diferencia * -1;
                     producto.Stock -= diferencia;
@@ -126,15 +121,15 @@ namespace ControlStock.Server.Controllers
             return Ok(responseApi);
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
 
-        public async Task<IActionResult> Delete(int codVen)
+        public async Task<IActionResult> Delete(int Id)
         {
             var responseApi = new ResponseAPI<int>();
 
             try
             {
-                var mdVentas = await context.Ventas.FirstOrDefaultAsync(e => e.CodVenta == codVen);
+                var mdVentas = await context.Ventas.FirstOrDefaultAsync(e => e.Id == Id);
                 if (mdVentas != null)
                 {
                     context.Ventas.Remove(mdVentas);

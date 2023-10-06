@@ -15,13 +15,8 @@ namespace Stock.BData.Data.Entity
         [Required]
 
         public int CodVenta { get; set; }
-        public string ProductoNombre { get; set; }
         [Required]
         public int CodProducto { get; set; }
-        [Required]  
-        public int ProductoId { get; set; }
-        public Producto Producto { get; set; }
-        public decimal Precio { get; set; }
         [Required]
         public DateTime FechaVenta { get; set; }
 		[Required]

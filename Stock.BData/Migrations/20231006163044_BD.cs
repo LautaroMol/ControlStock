@@ -34,38 +34,24 @@ namespace Stock.BData.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CodVenta = table.Column<int>(type: "int", nullable: false),
-                    ProductoNombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CodProducto = table.Column<int>(type: "int", nullable: false),
-                    ProductoId = table.Column<int>(type: "int", nullable: false),
-                    Precio = table.Column<decimal>(type: "Decimal(10,2)", nullable: false),
                     FechaVenta = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Cantidad = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Ventas", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Ventas_Productos_ProductoId",
-                        column: x => x.ProductoId,
-                        principalTable: "Productos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Ventas_ProductoId",
-                table: "Ventas",
-                column: "ProductoId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Ventas");
+                name: "Productos");
 
             migrationBuilder.DropTable(
-                name: "Productos");
+                name: "Ventas");
         }
     }
 }

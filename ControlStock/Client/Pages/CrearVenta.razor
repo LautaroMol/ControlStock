@@ -27,9 +27,6 @@
         if (!respuesta.Error)
         {
             producto = respuesta.Respuesta;
-            ventaDTO.Producto = producto.NombreProducto;
-            ventaDTO.Precio = producto.PrecioProducto;
-            ventaDTO.productoDTO = producto;
 
             if (producto.Stock < ventaDTO.Cantidad)
             {
