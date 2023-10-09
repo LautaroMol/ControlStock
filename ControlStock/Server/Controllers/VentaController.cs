@@ -24,17 +24,15 @@ namespace ControlStock.Server.Controllers
             var venta = await context.Ventas.ToListAsync();
             return venta;
         }
-
-        [HttpGet("int:Id")]
-        public async Task<ActionResult<Venta>> Getcodven(int Id)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<Venta>> GetId(int Id)
         {
             var buscar = await context.Ventas.FirstOrDefaultAsync(c => c.Id == Id);
-
             if (buscar is null)
             {
-                return BadRequest($"No se encontro la Venta de numero: {Id}");
+                return BadRequest($"venta no encontrada, verifique el id: {Id}");
             }
-            return buscar;
+            return Ok(buscar);
         }
 
         [HttpPost]
