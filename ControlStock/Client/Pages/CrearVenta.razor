@@ -11,6 +11,7 @@
     private ProductoDTO producto = new ProductoDTO();
     private bool mostrarErrorProductoNoEncontrado = false;
     private bool mostrarErrorStockInsuficiente = false;
+    private bool mostrarErrorStockBajo = false;
 
     private async Task Grabar()
     {
@@ -43,25 +44,11 @@
         }
 
         var httpRespuesta = await http.Post<VentaDTO>("api/Venta", ventaDTO);
-
-        if (httpRespuesta.Error && httpRespuesta.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        var stockActualizado = await http.GetCod<ProductoDTO>($"api/Producto/GetCod/{ventaDTO.CodProducto}");
+        if (stockActualizado.Respuesta.Stock <= 5)
         {
-            var errorResponse = await httpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
-            if (errorResponse.Contains("Stock insuficiente"))
-            {
-                mostrarErrorStockInsuficiente = true;
-                mostrarErrorProductoNoEncontrado = false; // Ocultar el mensaje de producto no encontrado si estaba visible
-                return;
-            }
-        }
-
-        if (httpRespuesta.Error)
-        {
-            var body = httpRespuesta.HttpResponseMessage;
-        }
-        else
-        {
-            navigationManager.NavigateTo("/ventas");
+            mostrarErrorStockBajo = true;
+            Console.WriteLine(mostrarErrorStockBajo);
         }
     }
 
@@ -78,6 +65,13 @@
     private void CerrarErrorStockInsuficiente()
     {
         mostrarErrorStockInsuficiente = false;
+    }
+    private void CerrarErrorStockBajoYContinuar()
+    {
+        mostrarErrorStockBajo = false;
+        Console.WriteLine("CerrarErrorStockBajoYContinuar se llamó");
+        // Redirige a otra página
+        navigationManager.NavigateTo("/ventas");
     }
 }
 
@@ -102,3 +96,16 @@
         </div>
     </div>
 }
+
+@if (mostrarErrorStockBajo)
+{
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 5px;">
+            <h4>ATENCION</h4>
+            <p style="color: red;">Stock bajo (5 o menos unidades restantes).</p>
+            <button class="btn btn-primary" @onclick="CerrarErrorStockBajoYContinuar">OK</button>
+        </div>
+    </div>
+}
+
+

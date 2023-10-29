@@ -84,6 +84,19 @@
             background-color: gray;
             cursor: not-allowed;
         }
+
+    .low-stock {
+        color: red;
+        font-weight: bold;
+    }
+
+    /* Redefinir el ancho de la tabla para ajustarse al contenido */
+    table {
+        margin: 0 auto;
+        border-collapse: collapse;
+        text-align: center;
+        table-layout: auto;
+    }
     </style>
 
 <PageTitle>Productos</PageTitle>
@@ -101,7 +114,7 @@
         <th>Codigo</th>
         <th>Nombre del Producto</th>
         <th>Precio del Producto</th>
-        <th>Stock</th>
+        <th class="low-stock-header">Stock</th>
         <th>Acciones</th>
     </tr>
 
@@ -125,7 +138,7 @@
                 <td>@item.CodProducto</td>
                 <td>@item.NombreProducto</td>
                 <td>@item.PrecioProducto</td>
-                <td>@item.Stock</td>
+                <td class="@(item.Stock <= 5 ? "low-stock" : "")">@item.Stock</td>
                 <td>
                     <a class="btn btn-editar" href="producto/editar/@item.Id">Editar</a>
                     <a class="btn btn-borrar" @onclick="()=>Eliminar(item)">Borrar Producto</a>
@@ -134,7 +147,6 @@
         }
     }
 </table>
-
 <!-- Navegación de páginas -->
 @if (totalPages > 1)
 {
@@ -172,12 +184,19 @@
         if (!respuesta.Error)
         {
             productos = respuesta.Respuesta;
-            CalculateTotalPages();
+            SortProductsByStock(); // Ordena los productos por stock
         }
         else
         {
             Mensaje = await respuesta.ObtenerError();
         }
+    }
+
+    private void SortProductsByStock()
+    {
+        // Ordena la lista de productos por la cantidad de stock de forma ascendente
+        productos = productos.OrderBy(p => p.Stock).ToList();
+        CalculateTotalPages();
     }
 
     private void CalculateTotalPages()

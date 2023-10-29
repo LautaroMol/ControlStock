@@ -77,16 +77,16 @@ namespace ControlStock.Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPut]
+        [HttpPut("{id:int}")]
 
-        public async Task<IActionResult> Editar(VentaDTO ventaDTO, int codVenta)
+        public async Task<IActionResult> Editar(Venta ventaDTO, int Id)
         {
             var responseApi = new ResponseAPI<int>();
             int diferencia = 0;
             try
             {
                 var producto = await context.Productos.FirstOrDefaultAsync(o => o.CodProducto == ventaDTO.CodProducto);
-                var mdVenta = await context.Ventas.FirstOrDefaultAsync(e => e.CodVenta == codVenta);
+                var mdVenta = await context.Ventas.FirstOrDefaultAsync(e => e.Id == Id);
                 if (mdVenta != null & producto != null)
                 {
                     diferencia += mdVenta.Cantidad;

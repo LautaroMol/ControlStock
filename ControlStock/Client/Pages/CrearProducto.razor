@@ -5,31 +5,38 @@
 
 
 <h3>Nuevo Producto</h3>
-
+@if (codigoDuplicado)
+{
+	<p style="color: red;">El código ya está siendo utilizado por otro producto.</p>
+}
 <FormProducto product="producto" onValidSubbmit="Grabar" onCancel="Cancelar"/>
 
 
 @code {
-	private Producto producto = new Producto();
+    private Producto producto = new Producto();
 
-	private async Task Grabar()
-	{
-		ProductoDTO productoDTO = new()
-			{
-				CodProducto = producto.CodProducto,
-				NombreProducto = producto.NombreProducto,
-				PrecioProducto = producto.PrecioProducto,
-				Stock = producto.Stock
-			};
-		var httpRespuesta = await http.Post<ProductoDTO>("api/Producto", productoDTO);
+    private bool codigoDuplicado = false;
 
-		if (httpRespuesta.Error)
-		{
-			var body = httpRespuesta.HttpResponseMessage;
-		}
-		else { navigationManager.NavigateTo("/productos"); }
-
-	}
+    private async Task Grabar()
+    {
+        ProductoDTO productoDTO = new()
+            {
+                CodProducto = producto.CodProducto,
+                NombreProducto = producto.NombreProducto,
+                PrecioProducto = producto.PrecioProducto,
+                Stock = producto.Stock
+            };
+        var existe = await http.Get<ProductoDTO>($"api/Producto/GetCod/{productoDTO.CodProducto}");
+        if (existe.Respuesta != null)
+        {
+            codigoDuplicado = true;
+        }
+        else
+        {
+            var httpRespuesta = await http.Post<ProductoDTO>("api/Producto", productoDTO);
+            navigationManager.NavigateTo("/productos");
+        }
+    }
 	private void Cancelar()
 	{
 		navigationManager.NavigateTo("/productos");
